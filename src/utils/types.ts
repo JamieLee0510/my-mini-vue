@@ -20,4 +20,9 @@ export type VNode = {
     props: Object | null
     children: string | number | Array<any> | null
     shapeFlags: ShapeFlags
+    el?: HTMLElement | Text // 用來unmount
 }
+
+export type VueHTMLElement = {
+    _vnode?: VNode | null
+} & HTMLElement

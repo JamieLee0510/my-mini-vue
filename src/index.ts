@@ -25,34 +25,16 @@ watchEffect(() => {
     console.log(`---watchEffect--count1:${observe1.count1}`)
 })
 
-const demoVNode = h(
-    'div',
-    {
-        class: 'hello vnode',
-        style: {
-            border: '1px solid',
-        },
-        onClick: () => {
-            console.log('click on vnode')
-        },
-        id: 'foo',
-        checked: '',
-        custom: false,
-    },
-    [
-        h('ul', null, [
-            h('li', { style: { color: 'red' } }, [h(Text, null, '1')]),
-            h('li', null, '2'),
-            h('li', { style: { color: 'blue' } }, '3'),
-            h(Fragment, null, [h('li', null, '4'), h('li', null, 5)]),
-            h('li', null, [h(Text, null, 'hello world')]),
-        ]),
+const demoVNode = h('ui', null, [
+    h('li', null, 'first'),
+    h(Fragment, null, [h('li', null, 'middle')]),
 
-        ,
-    ],
-)
+    h('li', null, 'last'),
+])
 
-render(demoVNode, document.querySelector('#app')!)
+setTimeout(() => {
+    render(demoVNode, document.querySelector('#app')!)
+}, 2000)
 
 declare global {
     interface Window {
