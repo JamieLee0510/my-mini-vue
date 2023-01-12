@@ -25,15 +25,20 @@ watchEffect(() => {
     console.log(`---watchEffect--count1:${observe1.count1}`)
 })
 
-const demoVNode = h('ui', null, [
+const demoVNode2 = h('ui', null, [
     h('li', null, 'first'),
     h(Fragment, null, [h('li', null, 'middle')]),
-
     h('li', null, 'last'),
 ])
+const demoVNode1 = h('ui', null, [
+    h('li', null, 'first'),
+    h(Fragment, null, []),
+    h('li', null, 'last'),
+])
+render(demoVNode1, document.querySelector('#app')!)
 
 setTimeout(() => {
-    render(demoVNode, document.querySelector('#app')!)
+    render(demoVNode2, document.querySelector('#app')!)
 }, 2000)
 
 declare global {

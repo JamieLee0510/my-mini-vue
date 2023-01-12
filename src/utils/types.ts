@@ -18,10 +18,13 @@ export enum ShapeFlags {
 export type VNode = {
     type: string | Object | Text | Symbol
     props: Object | null
-    children: string | number | Array<any> | null
+    children: string | number | Array<any> | null | Node
     shapeFlags: ShapeFlags
     el?: HTMLElement | Text // 用來unmount
+    anchor?: Text // 為了Fragment屬性
 }
+
+export type Anchor = Text | null
 
 export type VueHTMLElement = {
     _vnode?: VNode | null

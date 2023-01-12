@@ -13,8 +13,8 @@ export const Fragment = Symbol('Fragment')
  */
 export function h(
     type: string | Object | typeof Text | typeof Fragment,
-    props: Object | null,
-    children: string | number | Array<any> | null,
+    props?: Object | null,
+    children?: string | number | Array<any> | null,
 ): VNode {
     let shapeFlags
 
@@ -37,8 +37,8 @@ export function h(
 
     return {
         type,
-        props,
-        children,
+        props: props!,
+        children: children!,
         shapeFlags,
     }
 }
