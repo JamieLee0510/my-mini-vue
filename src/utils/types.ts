@@ -21,7 +21,8 @@ export type VNode = {
     children: string | number | Array<any> | null | Node
     shapeFlags: ShapeFlags
     el?: HTMLElement | Text // 用來unmount
-    anchor?: Text // 為了Fragment屬性
+    anchor?: Text // 為了Fragment屬性,
+    key?: any
 }
 
 export type Anchor = Text | null

@@ -40,5 +40,6 @@ export function h(
         props: props!,
         children: children!,
         shapeFlags,
+        key: props && props['key'],
     }
 }
