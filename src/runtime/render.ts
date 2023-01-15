@@ -1,5 +1,6 @@
 import { isBoolean } from '../utils'
 import { Anchor, ShapeFlags, VNode, VueHTMLElement } from '../utils/types'
+import { mountComponent } from './component'
 
 export function render(vnode: VNode | null, container: VueHTMLElement) {
     const prevVNode = container._vnode
@@ -24,12 +25,13 @@ function unmount(vnode: VNode) {
     }
 }
 
-function patch(n1: VNode | null, n2: VNode, container: VueHTMLElement, anchor?: Anchor) {
+export function patch(n1: VNode | null, n2: VNode, container: VueHTMLElement, anchor?: Anchor) {
     if (n1 && !isSameNode(n1, n2)) {
         anchor = (n1.anchor || n1.el!).nextSibling as Anchor
         unmount(n1)
         n1 = null
     }
+
     const { shapeFlags } = n2
     if (shapeFlags & ShapeFlags.COMPONENT) {
         processComponent(n1, n2, container, anchor)
@@ -48,7 +50,21 @@ function isSameNode(n1, n2) {
 
 function processComponent(n1: VNode | null, n2: VNode, container: VueHTMLElement, anchor?: Anchor) {
     //TODO
+    if (n1) {
+        // TODO
+        // shouldComponentUpdate
+        updateComponent(n1, n2)
+    } else {
+        mountComponent(n2, container, anchor)
+    }
 }
+
+function updateComponent(n1: VNode, n2: VNode) {
+    n2.component = n1.component!
+    n2.component.next = n2
+    n2.component?.update()
+}
+
 function processText(n1: VNode | null, n2: VNode, container: VueHTMLElement, anchor?: Anchor) {
     if (n1) {
         n2.el = n1.el
@@ -86,7 +102,7 @@ function mountTextNode(vnode: VNode, container: HTMLElement, anchor?: Anchor) {
     container.insertBefore(textNode, anchor!)
     vnode.el = textNode // vnode 記錄掛載的真實的dom節點
 }
-function mountElement(vnode: VNode, container: HTMLElement, anchor: Text | null) {
+function mountElement(vnode: VNode, container: HTMLElement, anchor: Anchor) {
     const { shapeFlags, type, props, children } = vnode
     const el = document.createElement(type as string)
 
@@ -160,11 +176,20 @@ function mountChildren(
     })
 }
 function unmountComponent(vnode: VNode) {
-    throw new Error('Function not implemented.')
+    unmount(vnode.component?.subtree)
 }
 
 function unmountFragment(vnode: VNode) {
-    throw new Error('Function not implemented.')
+    let curr = vnode.el as HTMLElement
+    let end = vnode.anchor as HTMLElement
+
+    const { parentNode } = curr as HTMLElement
+    while (curr !== end) {
+        let next = curr!.nextSibling as HTMLElement
+        parentNode!.removeChild(curr!)
+        curr = next
+    }
+    parentNode!.removeChild(end)
 }
 
 function unmountChildren(children: string | number | any[] | null | Node) {

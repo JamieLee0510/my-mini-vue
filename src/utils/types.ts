@@ -16,17 +16,35 @@ export enum ShapeFlags {
 }
 
 export type VNode = {
-    type: string | Object | Text | Symbol
+    type: string | VNodeObject | Text | Symbol
     props: Object | null
     children: string | number | Array<any> | null | Node
     shapeFlags: ShapeFlags
     el?: HTMLElement | Text // 用來unmount
-    anchor?: Text // 為了Fragment屬性,
+    anchor?: Text | HTMLElement // 為了Fragment屬性,
     key?: any
+    component?: Instance
 }
 
-export type Anchor = Text | null
+export type VNodeObject = {
+    props?: any[]
+    setup?: (props: any, obj: any) => any
+    render: any
+}
+
+export type Anchor = Text | null | HTMLElement
 
 export type VueHTMLElement = {
     _vnode?: VNode | null
 } & HTMLElement
+
+export type Instance = {
+    props: any
+    attrs: any
+    setupState: any
+    isMounted: boolean
+    ctx: any
+    subtree: any
+    update: any
+    next: any
+}
