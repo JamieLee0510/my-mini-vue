@@ -57,6 +57,8 @@ const Comp02 = {
         const count = ref(0)
         const add = () => {
             count.value += 1
+            count.value += 1
+            count.value += 1
         }
         return {
             count,
@@ -64,6 +66,7 @@ const Comp02 = {
         }
     },
     render(ctx) {
+        console.log('render')
         return [h('div', null, ctx.count.value), h('button', { onClick: ctx.add }, 'add')]
     },
 }

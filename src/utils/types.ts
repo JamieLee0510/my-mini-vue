@@ -2,7 +2,7 @@ export const data = ''
 
 export type LazyOption = {
     lazy?: boolean
-    scheduler?: () => void
+    scheduler?: (args?) => void
 }
 
 export enum ShapeFlags {

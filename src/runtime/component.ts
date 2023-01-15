@@ -3,6 +3,7 @@ import { reactive, watchEffect } from '../reactive'
 import { VNodeObject } from '../utils/types'
 import { normalizeVNode } from './vnode'
 import { patch } from './render'
+import { queueJob } from './scheduler'
 
 function updateProps(instance: Instance, vnode: VNode) {
     // 這邊有點不太懂，
@@ -47,48 +48,53 @@ export function mountComponent(vnode: VNode, container: VueHTMLElement, anchor?:
         ...instance.setupState,
     }
 
-    instance.update = watchEffect(() => {
-        if (!instance.isMounted) {
-            // mount state
-            const subTree = (instance.subtree = normalizeVNode(component.render(instance.ctx)))
+    instance.update = watchEffect(
+        () => {
+            if (!instance.isMounted) {
+                // mount state
+                const subTree = (instance.subtree = normalizeVNode(component.render(instance.ctx)))
 
-            // 繼承attrs
-            if (Object.keys(instance.attrs).length) {
-                subTree.props = {
-                    ...subTree.props,
-                    ...instance.attrs,
+                // 繼承attrs
+                if (Object.keys(instance.attrs).length) {
+                    subTree.props = {
+                        ...subTree.props,
+                        ...instance.attrs,
+                    }
                 }
-            }
 
-            patch(null, subTree, container, anchor)
-            instance.isMounted = true
-        } else {
-            // update state
-            if (instance.next) {
-                //被動更新
+                patch(null, subTree, container, anchor)
+                instance.isMounted = true
+            } else {
+                // update state
+                if (instance.next) {
+                    //被動更新
 
-                vnode = instance.next
-                instance.next = null
+                    vnode = instance.next
+                    instance.next = null
 
-                updateProps(instance, vnode)
-                instance.ctx = {
-                    ...instance.props,
-                    ...instance.setupState,
+                    updateProps(instance, vnode)
+                    instance.ctx = {
+                        ...instance.props,
+                        ...instance.setupState,
+                    }
                 }
-            }
-            // 主動更新
-            const preSubtree = instance.subtree
-            const subTree = (instance.subtree = normalizeVNode(component.render(instance.ctx)))
+                // 主動更新
+                const preSubtree = instance.subtree
+                const subTree = (instance.subtree = normalizeVNode(component.render(instance.ctx)))
 
-            // 繼承attrs
-            if (Object.keys(instance.attrs).length) {
-                subTree.props = {
-                    ...subTree.props,
-                    ...instance.attrs,
+                // 繼承attrs
+                if (Object.keys(instance.attrs).length) {
+                    subTree.props = {
+                        ...subTree.props,
+                        ...instance.attrs,
+                    }
                 }
-            }
 
-            patch(preSubtree, subTree, container, anchor)
-        }
-    })
+                patch(preSubtree, subTree, container, anchor)
+            }
+        },
+        {
+            scheduler: queueJob,
+        },
+    )
 }
