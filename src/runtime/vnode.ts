@@ -1,5 +1,5 @@
-import { isArray, isNumber, isString } from '../utils'
-import { ShapeFlags, VNode } from '../utils/types'
+import { isArray, isNumber, isObject, isString } from '../utils'
+import { ShapeFlags, VNode, VNodeObject } from '../utils/types'
 
 export const Text = Symbol('text')
 export const Fragment = Symbol('Fragment')
@@ -12,7 +12,7 @@ export const Fragment = Symbol('Fragment')
  * @returns VNode
  */
 export function h(
-    type: string | Object | typeof Text | typeof Fragment,
+    type: string | VNodeObject | typeof Text | typeof Fragment,
     props?: Object | null,
     children?: string | number | Array<any> | null,
 ): VNode {
@@ -42,4 +42,15 @@ export function h(
         shapeFlags,
         key: props && props['key'],
     }
+}
+
+export function normalizeVNode(result: any) {
+    if (isArray(result)) {
+        return h(Fragment, null, result)
+    }
+    if (isObject(result)) {
+        // 已經為VNode
+        return result
+    }
+    return h(Text, null, result.toString())
 }
