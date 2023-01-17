@@ -1,5 +1,12 @@
 const queue: any[] = []
+const resolvedPromise = Promise.resolve()
+let currFlushPromise: Promise<void> | null = null
 let isFlushing = false
+
+export function nextTick(fn: () => void | null | undefined): Promise<void> {
+    const p = currFlushPromise || resolvedPromise
+    return fn == null ? p.then(fn) : p
+}
 
 export function queueJob(job) {
     if (!queue.length || !queue.includes(job)) {
@@ -10,11 +17,7 @@ export function queueJob(job) {
 function queueFlush() {
     if (!isFlushing) {
         isFlushing = true
-        Promise.resolve().then(() => {
-            //flush jobs
-            flushJobs()
-            isFlushing = false
-        })
+        currFlushPromise = resolvedPromise.then(flushJobs)
     }
 }
 
@@ -27,5 +30,6 @@ function flushJobs() {
     } finally {
         isFlushing = false
         queue.length = 0 // empty the queue
+        currFlushPromise = null
     }
 }
