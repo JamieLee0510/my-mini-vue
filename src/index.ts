@@ -1,5 +1,5 @@
 import { reactive, ref, watchEffect, computed } from './reactive'
-import { h, Text, Fragment, render } from './runtime'
+import { h, Text, Fragment, render, createApp } from './runtime'
 
 // const observe1 = (window.observed = reactive({ count1: 1, count2: 2 }))
 // const observeArr = (window.observedArr = reactive([1]))
@@ -71,8 +71,10 @@ const Comp02 = {
     },
 }
 
-const vnode = h(Comp02)
-render(vnode, document.body) // 應渲染為<div class='a' bar='bar'>foo</div>
+// const vnode = h(Comp02)
+// render(vnode, document.body) // 應渲染為<div class='a' bar='bar'>foo</div>
+
+createApp(Comp02).mount(document.body)
 
 declare global {
     interface Window {
