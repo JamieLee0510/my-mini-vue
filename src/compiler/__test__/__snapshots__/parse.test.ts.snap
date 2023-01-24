@@ -1,0 +1,114 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`compiler: parse Element self closing multiple tag 1`] = `
+{
+  "children": [
+    {
+      "children": [],
+      "directives": [
+        {
+          "arg": {
+            "content": "class",
+            "isStatic": true,
+            "type": 3,
+          },
+          "exp": {
+            "content": "{ some: condition }",
+            "isStatic": false,
+            "type": 3,
+          },
+          "name": "bind",
+          "type": 6,
+        },
+      ],
+      "isSelfClosing": true,
+      "props": [],
+      "tag": "div",
+      "tagType": 0,
+      "type": 1,
+    },
+    {
+      "children": [],
+      "directives": [
+        {
+          "arg": {
+            "content": "style",
+            "isStatic": true,
+            "type": 3,
+          },
+          "exp": {
+            "content": "{ color: 'red' }",
+            "isStatic": false,
+            "type": 3,
+          },
+          "name": "bind",
+          "type": 6,
+        },
+      ],
+      "isSelfClosing": true,
+      "props": [],
+      "tag": "p",
+      "tagType": 0,
+      "type": 1,
+    },
+  ],
+  "type": 0,
+}
+`;
+
+exports[`compiler: parse Element valid html 1`] = `
+{
+  "children": [
+    {
+      "children": [
+        {
+          "children": [],
+          "directives": [
+            {
+              "arg": {
+                "content": "style",
+                "isStatic": true,
+                "type": 3,
+              },
+              "exp": {
+                "content": "{ color: 'red' }",
+                "isStatic": false,
+                "type": 3,
+              },
+              "name": "bind",
+              "type": 6,
+            },
+          ],
+          "isSelfClosing": true,
+          "props": [],
+          "tag": "p",
+          "tagType": 0,
+          "type": 1,
+        },
+      ],
+      "directives": [
+        {
+          "arg": {
+            "content": "class",
+            "isStatic": true,
+            "type": 3,
+          },
+          "exp": {
+            "content": "{ some: condition }",
+            "isStatic": false,
+            "type": 3,
+          },
+          "name": "bind",
+          "type": 6,
+        },
+      ],
+      "isSelfClosing": false,
+      "props": [],
+      "tag": "div",
+      "tagType": 0,
+      "type": 1,
+    },
+  ],
+  "type": 0,
+}
+`;

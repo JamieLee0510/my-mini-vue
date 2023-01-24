@@ -144,8 +144,8 @@ function parseAttributes(context: AstContext) {
 
     while (
         context.source.length &&
-        context.source.startsWith('>') &&
-        context.source.startsWith('/>')
+        !context.source.startsWith('>') &&
+        !context.source.startsWith('/>')
     ) {
         let attr = parseAttribute(context)
         if (attr.type === NodeTypes.DIRECTIVE) {
@@ -172,7 +172,7 @@ function parseAttribute(context: AstContext): DirectiveNode | AttributeNode {
         advanceSpaces(context) // 可能後面有空格
     }
     // Direction, 靠name來判別--- ‘v-*’ or ‘:*’
-    if (/^(v-|:|@)/.test(name)) {
+    if (/^(:|@|v-)/.test(name)) {
         // <div :class="foo">...</div>
         // <div @click="foo">...</div>
         // <div v-bind:class="foo">...</div>
@@ -228,8 +228,10 @@ function parseAttributeValue(context: AstContext) {
 function parseInterpolation(context: AstContext): InterpolationNode {
     const [openFlag, closeFlag] = context.options.delimiters
     advanceBy(context, openFlag.length)
+
     const endIndex = context.source.indexOf(closeFlag)
     const content = parseTextData(context, endIndex).trim()
+
     advanceBy(context, closeFlag.length)
     return {
         type: NodeTypes.INTERPOLATION,
@@ -253,7 +255,7 @@ function isEnd(context: AstContext) {
 }
 
 // 吃掉字符
-function advanceBy(context: AstContext, numberOfCharacters) {
+function advanceBy(context: AstContext, numberOfCharacters: number) {
     context.source = context.source.slice(numberOfCharacters)
 }
 
