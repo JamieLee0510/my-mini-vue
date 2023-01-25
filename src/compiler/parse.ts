@@ -7,10 +7,11 @@ import {
     DirectiveNode,
     ElementNode,
     InterpolationNode,
+    RootNode,
     TextNode,
 } from './type'
 
-export function parse(content: string) {
+export function parse(content: string): RootNode {
     // 因為Vue是選擇函數式的寫法、而不是OOP，
     // 所以會需要context來傳遞上下文（？
     const context = createParseContext(content)

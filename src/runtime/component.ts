@@ -1,5 +1,5 @@
 import { Anchor, Instance, VNode, VueHTMLElement } from '../utils/types'
-import { reactive, watchEffect } from '../reactive'
+import { reactive, effect } from '../reactivity'
 import { VNodeObject } from '../utils/types'
 import { normalizeVNode } from './vnode'
 import { patch } from './render'
@@ -48,7 +48,7 @@ export function mountComponent(vnode: VNode, container: VueHTMLElement, anchor?:
         ...instance.setupState,
     }
 
-    instance.update = watchEffect(
+    instance.update = effect(
         () => {
             if (!instance.isMounted) {
                 // mount state
