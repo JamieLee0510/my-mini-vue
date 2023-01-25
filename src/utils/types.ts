@@ -29,7 +29,8 @@ export type VNode = {
 export type VNodeObject = {
     props?: any[]
     setup?: (props: any, obj: any) => any
-    render: any
+    render?: any
+    template?: string
 }
 
 export type Anchor = Text | null | HTMLElement

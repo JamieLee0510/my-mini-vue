@@ -1,9 +1,10 @@
 import { Anchor, Instance, VNode, VueHTMLElement } from '../utils/types'
-import { reactive, watchEffect } from '../reactive'
+import { reactive, effect } from '../reactivity'
 import { VNodeObject } from '../utils/types'
 import { normalizeVNode } from './vnode'
 import { patch } from './render'
 import { queueJob } from './scheduler'
+import { compile } from '../compiler/compile'
 
 function updateProps(instance: Instance, vnode: VNode) {
     // 這邊有點不太懂，
@@ -42,13 +43,23 @@ export function mountComponent(vnode: VNode, container: VueHTMLElement, anchor?:
         instance.setupState = component.setup(instance.props, { attrs: instance.attrs })
     }
 
-    // Vue3的源碼是用Proxy來代理
+    // Vue3的源碼是用Proxy來代理，所以在props、state有變化時可以重新渲染
     instance.ctx = {
         ...instance.props,
         ...instance.setupState,
     }
 
-    instance.update = watchEffect(
+    if (!component.render && component.template) {
+        let { template } = component
+        if (template[0] === '#') {
+            const el = document.querySelector(template[0])
+            template = el ? el.innerHTML : ''
+        }
+        const codeStr = compile(template)
+        component.render = new Function('ctx', codeStr)
+    }
+
+    instance.update = effect(
         () => {
             if (!instance.isMounted) {
                 // mount state

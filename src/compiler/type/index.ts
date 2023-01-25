@@ -1,21 +1,25 @@
 import { NodeTypes, ElementTypes } from '../ast'
 
+// 根節點
 export type RootNode = {
     type: NodeTypes.ROOT
-    children: any[]
+    children: ChildrenNode[]
 }
 
+// 文本節點
 export type TextNode = {
     type: NodeTypes.TEXT
     content: string
 }
 
+//  js表達式節點---v-if、:、@
 export type ExpressionNode = {
     type: NodeTypes.SIMPLE_EXPRESSION
     content: string
     isStatic: boolean
 }
 
+// 插值節點---{{count}}
 export type InterpolationNode = {
     type: NodeTypes.INTERPOLATION
     content: {
@@ -25,44 +29,28 @@ export type InterpolationNode = {
     }
 }
 
+// 元素節點，原生元素或Vue組件
 export type ElementNode = {
     type: NodeTypes.ELEMENT
     tag: string // 标签名,
     tagType: ElementTypes // 是组件还是原生元素,
-    props: any[] // 属性节点数组,
-    directives: any[] // 指令数组
+    props: AttributeNode[] // 属性节点数组,
+    directives: DirectiveNode[] // 指令数组
     isSelfClosing: boolean // 是否是自闭合标签,
-    children: any[]
+    children: ChildrenNode[]
 }
 
 export type AttributeNode = {
     type: NodeTypes.ATTRIBUTE
     name: string
-    value:
-        | undefined
-        | {
-              type: NodeTypes.TEXT
-              content: string
-          } // 纯文本节点
+    value: undefined | TextNode // 纯文本节点
 }
 
 export type DirectiveNode = {
     type: NodeTypes.DIRECTIVE
     name: string
-    exp:
-        | undefined
-        | {
-              type: NodeTypes.SIMPLE_EXPRESSION
-              content: string
-              isStatic: false
-          } // 表达式节点
-    arg:
-        | undefined
-        | {
-              type: NodeTypes.SIMPLE_EXPRESSION
-              content: string
-              isStatic: true
-          } // 表达式节点
+    exp: undefined | ExpressionNode // 表达式节点
+    arg: undefined | ExpressionNode // 表达式节点
 }
 
 export type NullNode = {
@@ -79,6 +67,8 @@ export type AstNodeType =
     | AttributeNode
     | DirectiveNode
     | NullNode
+
+export type ChildrenNode = TextNode | InterpolationNode | ElementNode | InterpolationNode | NullNode
 
 export type AstContext = {
     source: string

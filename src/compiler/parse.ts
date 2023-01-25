@@ -4,13 +4,15 @@ import {
     AstContext,
     AstNodeType,
     AttributeNode,
+    ChildrenNode,
     DirectiveNode,
     ElementNode,
     InterpolationNode,
+    RootNode,
     TextNode,
 } from './type'
 
-export function parse(content: string) {
+export function parse(content: string): RootNode {
     // 因為Vue是選擇函數式的寫法、而不是OOP，
     // 所以會需要context來傳遞上下文（？
     const context = createParseContext(content)
@@ -21,7 +23,7 @@ function createParseContext(content: string): AstContext {
     return {
         options: {
             delimiters: ['{{', '}}'],
-            isValidTag, // 把解析tag的方法放到options裡
+            isValidTag, // 把解析tag的方法放到options裡,
             isNativeTag, // 可以讓“跨平台”方便配置
         },
         source: content,
@@ -29,11 +31,11 @@ function createParseContext(content: string): AstContext {
 }
 
 function parseChildren(context: AstContext) {
-    const nodes: AstNodeType[] = []
+    const nodes: ChildrenNode[] = []
 
     while (!isEnd(context)) {
         const s = context.source
-        let node: AstNodeType
+        let node: ChildrenNode
         if (s.startsWith(context.options.delimiters[0])) {
             // parseInterpolation
             node = parseInterpolation(context)

@@ -1,3 +1,5 @@
+import { RootNode } from './type'
+
 export enum NodeTypes {
     ROOT, // 根節點
     ELEMENT, // 元素節點，有原生HTML和vue component之分（ElementTypes）
@@ -14,7 +16,7 @@ export enum ElementTypes {
     COMPONENT,
 }
 
-export function createRoot(children) {
+export function createRoot(children): RootNode {
     return {
         type: NodeTypes.ROOT,
         children,
