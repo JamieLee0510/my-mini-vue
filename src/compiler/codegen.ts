@@ -40,6 +40,22 @@ function traverseNode(node: AstNodeType): string {
 
 // 處理特殊指令，如v-if、v-for
 function resolveElementASTNode(node: ElementNode) {
+    const ifNode = plunk(node.directives, 'if')
+    if (ifNode) {
+        let condition, consequent, alternate
+        // <div v-if="ok">hihi</div>
+        // -> ok? h('div',null,'hihi'):h<Text,null,''>
+        // 源碼中是有實現一個 createCommentVNode
+        const { exp } = ifNode
+        condition = exp!.content
+        alternate = createTextVNode() // 直接簡單創建空Text節點
+
+        // 遞迴處理，以防有其他指令
+        // 不過這樣以來，會有先後次序的問題
+        consequent = resolveElementASTNode(node)
+        return `${condition}? ${consequent} : ${alternate}`
+    }
+
     const forNode = plunk(node.directives, 'for')
     if (forNode) {
         // 處理for nodes,借助runtime中的 renderList函數
@@ -50,12 +66,15 @@ function resolveElementASTNode(node: ElementNode) {
         return `h(Fragment, null, 
             renderList(
                 ${source.trim()},
-                ${args.trim()}=>${createElementVNode(node)}))`
+                ${args.trim()}=>${resolveElementASTNode(node)}))` // 遞迴處理，以防有其他指令
     }
     return createElementVNode(node)
 }
 
-function createTextVNode(node: TextNode) {
+function createTextVNode(node?: TextNode) {
+    if (!node) {
+        return `h(Text,null,"")`
+    }
     const child = createText(node)
     return `h(Text,null,${child})`
 }
