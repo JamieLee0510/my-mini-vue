@@ -1,6 +1,13 @@
 import { capitalize } from '../utils'
 import { NodeTypes } from './ast'
-import { AstNodeType, ElementNode, InterpolationNode, RootNode, TextNode } from './type'
+import {
+    AstNodeType,
+    DirectiveNode,
+    ElementNode,
+    InterpolationNode,
+    RootNode,
+    TextNode,
+} from './type'
 
 export function codegen(ast: RootNode) {
     const returns = traverseNode(ast)
@@ -20,7 +27,7 @@ function traverseNode(node: AstNodeType): string {
             }
             return traverseChildren(node)
         case NodeTypes.ELEMENT:
-            return createElementVNode(node as ElementNode)
+            return resolveElementASTNode(node as ElementNode)
         case NodeTypes.INTERPOLATION:
             return createInterPolationVNode(node)
         case NodeTypes.TEXT:
@@ -30,6 +37,24 @@ function traverseNode(node: AstNodeType): string {
             return ''
     }
 }
+
+// 處理特殊指令，如v-if、v-for
+function resolveElementASTNode(node: ElementNode) {
+    const forNode = plunk(node.directives, 'for')
+    if (forNode) {
+        // 處理for nodes,借助runtime中的 renderList函數
+        // (item, index) in items
+        const { exp } = forNode
+        const [args, source] = exp!.content.split(/\sin\s|\sof\s/)
+        // renderList(items, (item,index)=>h('div',null,item+index))
+        return `h(Fragment, null, 
+            renderList(
+                ${source.trim()},
+                ${args.trim()}=>${createElementVNode(node)}))`
+    }
+    return createElementVNode(node)
+}
+
 function createTextVNode(node: TextNode) {
     const child = createText(node)
     return `h(Text,null,${child})`
@@ -110,4 +135,13 @@ function traverseChildren(node: ElementNode | RootNode) {
         results.push(traverseNode(child))
     }
     return `[${results.join(', ')}]`
+}
+
+function plunk(directives: DirectiveNode[], name: string, remove: boolean = true): DirectiveNode {
+    const index = directives.findIndex((dir) => dir.name == name)
+    const dir = directives[index]
+    if (index > -1 && remove) {
+        directives.splice(index, 1)
+    }
+    return dir
 }

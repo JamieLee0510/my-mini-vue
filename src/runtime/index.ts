@@ -1,3 +1,4 @@
+export { renderList } from './helper/renderList'
 export { render } from './render'
 export { queueJob, nextTick } from './scheduler'
 export { h, Text, Fragment } from './vnode'

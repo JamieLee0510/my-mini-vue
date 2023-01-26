@@ -6,7 +6,7 @@ import {
     Text,
     Fragment,
     nextTick,
-    // renderList,
+    renderList,
     // withModel,
     // resolveComponent,
 } from './runtime'
@@ -24,7 +24,7 @@ export const MiniVue = (window.MiniVue = {
     computed,
     effect,
     compile,
-    // renderList,
+    renderList,
     // withModel,
     // resolveComponent,
 })

@@ -15,12 +15,15 @@
             <input v-model="test.value" /> -->
         </div>
         <script type="module">
-            const { createApp, ref, reactive } = MiniVue
+            const { createApp, ref, reactive, renderList } = MiniVue
             createApp({
                 template: `
                   Counter Demo
                   <div>{{counter.value}}</div>
                   <button @click="add">add</button>
+                  <ul>
+                <li v-for="(item, index) in items" :key="index">{{item}}--{{index}}</li>
+            </ul>
                 `,
                 setup() {
                     // const items = reactive([{
@@ -30,6 +33,7 @@
                     //     name: 'bar'
                     //   },
                     // ])
+                    const items = [11, 22, 33, 44, 55]
                     const counter = ref(0)
                     const add = () => counter.value++
                     // const ok = ref(true)
@@ -39,6 +43,7 @@
                     return {
                         counter,
                         add,
+                        items,
                         // items,
                         // ok,
                         // toggle,
