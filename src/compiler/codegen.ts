@@ -1,6 +1,13 @@
 import { capitalize } from '../utils'
 import { NodeTypes } from './ast'
-import { AstNodeType, ElementNode, InterpolationNode, RootNode, TextNode } from './type'
+import {
+    AstNodeType,
+    DirectiveNode,
+    ElementNode,
+    InterpolationNode,
+    RootNode,
+    TextNode,
+} from './type'
 
 export function codegen(ast: RootNode) {
     const returns = traverseNode(ast)
@@ -20,7 +27,7 @@ function traverseNode(node: AstNodeType): string {
             }
             return traverseChildren(node)
         case NodeTypes.ELEMENT:
-            return createElementVNode(node as ElementNode)
+            return resolveElementASTNode(node as ElementNode)
         case NodeTypes.INTERPOLATION:
             return createInterPolationVNode(node)
         case NodeTypes.TEXT:
@@ -30,7 +37,44 @@ function traverseNode(node: AstNodeType): string {
             return ''
     }
 }
-function createTextVNode(node: TextNode) {
+
+// 處理特殊指令，如v-if、v-for
+function resolveElementASTNode(node: ElementNode) {
+    const ifNode = plunk(node.directives, 'if')
+    if (ifNode) {
+        let condition, consequent, alternate
+        // <div v-if="ok">hihi</div>
+        // -> ok? h('div',null,'hihi'):h<Text,null,''>
+        // 源碼中是有實現一個 createCommentVNode
+        const { exp } = ifNode
+        condition = exp!.content
+        alternate = createTextVNode() // 直接簡單創建空Text節點
+
+        // 遞迴處理，以防有其他指令
+        // 不過這樣以來，會有先後次序的問題
+        consequent = resolveElementASTNode(node)
+        return `${condition}? ${consequent} : ${alternate}`
+    }
+
+    const forNode = plunk(node.directives, 'for')
+    if (forNode) {
+        // 處理for nodes,借助runtime中的 renderList函數
+        // (item, index) in items
+        const { exp } = forNode
+        const [args, source] = exp!.content.split(/\sin\s|\sof\s/)
+        // renderList(items, (item,index)=>h('div',null,item+index))
+        return `h(Fragment, null, 
+            renderList(
+                ${source.trim()},
+                ${args.trim()}=>${resolveElementASTNode(node)}))` // 遞迴處理，以防有其他指令
+    }
+    return createElementVNode(node)
+}
+
+function createTextVNode(node?: TextNode) {
+    if (!node) {
+        return `h(Text,null,"")`
+    }
     const child = createText(node)
     return `h(Text,null,${child})`
 }
@@ -110,4 +154,13 @@ function traverseChildren(node: ElementNode | RootNode) {
         results.push(traverseNode(child))
     }
     return `[${results.join(', ')}]`
+}
+
+function plunk(directives: DirectiveNode[], name: string, remove: boolean = true): DirectiveNode {
+    const index = directives.findIndex((dir) => dir.name == name)
+    const dir = directives[index]
+    if (index > -1 && remove) {
+        directives.splice(index, 1)
+    }
+    return dir
 }
